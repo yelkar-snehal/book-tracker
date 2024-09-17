@@ -1,35 +1,39 @@
-'use client'; // This directive tells Next.js that this is a Client Component
+'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-interface Book {
-  id: number;
+export interface Book {
+  _id?: string;
   title: string;
   author: string;
   language: string;
 }
 
-const BookList: React.FC = () => {
-  const [books, setBooks] = useState<Book[]>([]);
+interface BookListProps {
+    books: Book[]
+    onDeleteBook: (id: string) => void;
+  }
 
-  useEffect(() => {
-    async function fetchBooks() {
-      const response = await fetch('/api/books');
-      const data = await response.json();
-      setBooks(data);
-    }
-
-    fetchBooks();
-  }, []);
-
+const BookList: React.FC<BookListProps> = ({books, onDeleteBook}) => {
+  
   return (
-    <ul className="list-disc pl-5">
-      {books.map((book) => (
-        <li key={book.id} className="mb-3">
-          <strong>{book.title}</strong> by {book.author} - Language: {book.language}
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="list-disc pl-5">
+        {books.map((book) => (
+          <li key={book._id || book.title} className="mb-3">
+            <strong>{book.title}</strong> by {book.author} - Language: {book.language}
+            {book._id && (
+              <button
+                onClick={() => onDeleteBook(book._id!)}
+                className="ml-3 px-2 py-1 bg-red-600 text-white rounded-md shadow-sm"
+              >
+                Delete
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 
